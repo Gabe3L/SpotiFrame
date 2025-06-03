@@ -1,12 +1,12 @@
-const http = require('http');
-const { spawn } = require('child_process');
-const { app, BrowserWindow } = require('electron');
+import * as http from 'http';
+import { app, BrowserWindow } from 'electron';
+import { spawn, ChildProcess } from 'child_process';
 
-let backendProcess;
-let mainWindow;
+let backendProcess: ChildProcess | null = null;
+let mainWindow: BrowserWindow | null = null;
 
-function createWindow() {
-  mainWindow  = new BrowserWindow({
+function createWindow(): void {
+  mainWindow = new BrowserWindow({
     resizable: false,
     transparent: true,
     alwaysOnTop: true,
@@ -32,26 +32,30 @@ function createWindow() {
   });
 }
 
-function startBackend() {
+function startBackend(): void {
   backendProcess = spawn('python', ['-m', 'backend.start'], {
     cwd: __dirname,
     shell: true,
   });
 
-  backendProcess.stdout.on('data', (data) => {
-    console.log(`${data}`);
-  });
+  if (backendProcess.stdout) {
+    backendProcess.stdout.on('data', (data) => {
+      console.log(`${data}`);
+    });
+  }
 
-  backendProcess.stderr.on('data', (data) => {
-    console.log(`${data}`);
-  });
+  if (backendProcess.stderr) {
+    backendProcess.stderr.on('data', (data) => {
+      console.log(`${data}`);
+    });
+  }
 
   backendProcess.on('close', (code) => {
     console.log(`Exited with code ${code}`);
   });
 }
 
-function waitForBackendReady() {
+function waitForBackendReady(): void {
   let dotCount = 1;
 
   const tryConnect = () => {

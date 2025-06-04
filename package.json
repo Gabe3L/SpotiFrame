@@ -2,9 +2,10 @@
   "name": "track_deck",
   "productName": "",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "dist/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "npm run build && electron .",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",

@@ -11,7 +11,8 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "electron": "^36.3.2"
+    "electron": "^36.3.2",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "track_deck": "file:"

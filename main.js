@@ -1,11 +1,16 @@
-import * as http from 'http';
+import http from 'http';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { app, BrowserWindow } from 'electron';
-import { spawn, ChildProcess } from 'child_process';
+import { spawn } from 'child_process';
 
-let backendProcess: ChildProcess | null = null;
-let mainWindow: BrowserWindow | null = null;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-function createWindow(): void {
+let backendProcess = null;
+let mainWindow = null;
+
+function createWindow() {
   mainWindow = new BrowserWindow({
     resizable: false,
     transparent: true,
@@ -20,7 +25,7 @@ function createWindow(): void {
   mainWindow.setIgnoreMouseEvents(true, { forward: true })
   mainWindow.setMenuBarVisibility(false);
 
-  mainWindow.loadFile('frontend/index.html');
+  mainWindow.loadFile('index.html');
   
   mainWindow.on('closed', () => {
     console.log('Window closed, killing backend...');
@@ -32,7 +37,7 @@ function createWindow(): void {
   });
 }
 
-function startBackend(): void {
+function startBackend() {
   backendProcess = spawn('python', ['-m', 'backend.start'], {
     cwd: __dirname,
     shell: true,
@@ -55,7 +60,7 @@ function startBackend(): void {
   });
 }
 
-function waitForBackendReady(): void {
+function waitForBackendReady() {
   let dotCount = 1;
 
   const tryConnect = () => {

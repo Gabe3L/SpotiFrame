@@ -1,21 +1,30 @@
 {
-  "name": "track_deck",
+  "name": "spotiframe",
   "productName": "",
   "version": "1.0.0",
-  "main": "dist/main.js",
+  "type": "module",
+  "main": "main.js",
   "scripts": {
     "start": "npm run build && electron .",
-    "build": "tsc"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.5",
     "electron": "^36.3.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
   },
   "dependencies": {
-    "track_deck": "file:"
+    "@types/css-modules": "^1.0.5",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "spotiframe": "file:"
   }
 }

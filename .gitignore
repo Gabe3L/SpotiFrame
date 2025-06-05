@@ -5,8 +5,6 @@ __pycache__/
 *.d.ts
 
 node_modules/
-dist/
-out/
 build/
 *.log
 *.tsbuildinfo

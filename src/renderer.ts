@@ -16,27 +16,31 @@ async function getCurrentTrack(): Promise<TrackData | null> {
     if (!response.ok) throw new Error("Network response not OK");
     const data: TrackData = await response.json()
     return data;
-  } catch (error) {
-    console.error("Failed to fetch current track:", error);
-    throw error;
+  } catch (err) {
+    console.error('Error occurred:', err);
+    return null;
   }
 }
 
 async function update(): Promise<void> {
-  const data = await getCurrentTrack();
+  try {
+    const data = await getCurrentTrack();
 
-  if (!data) {
-    if (titleElem) titleElem.textContent = "Error fetching track";
-    if (artistElem) artistElem.textContent = "";
-    if (playbackElem) playbackElem.style.width = `0%`;
-    if (albumArtImg) albumArtImg.src = "";
-    return;
+    if (!data) {
+      if (titleElem) titleElem.textContent = "Error fetching track";
+      if (artistElem) artistElem.textContent = "";
+      if (playbackElem) playbackElem.style.width = `0%`;
+      if (albumArtImg) albumArtImg.src = "";
+      return;
+    }
+
+    titleElem.textContent = data.song;
+    artistElem.textContent = data.artist;
+    playbackElem.style.width = `${data.progress * 100}%`;
+    albumArtImg.src = data.album_art;
+  } catch (err) {
+    console.error('Error occurred:', err);
   }
-
-  titleElem.textContent = data.song;
-  artistElem.textContent = data.artist;
-  playbackElem.style.width = `${data.progress * 100}%`;
-  albumArtImg.src = data.album_art;
 }
 
 setInterval(update, 5000);

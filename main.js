@@ -1,5 +1,5 @@
-import http from 'http';
 import path from 'path';
+import * as url from 'url';
 import { fileURLToPath } from 'url';
 import { app, BrowserWindow } from 'electron';
 import { spawn } from 'child_process';
@@ -12,20 +12,25 @@ let mainWindow = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
+    width: 350,
+    height: 140,
     resizable: false,
     transparent: true,
     alwaysOnTop: true,
-    kiosk: true,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
     }
   });
 
-  mainWindow.setIgnoreMouseEvents(true, { forward: true })
-  mainWindow.setMenuBarVisibility(false);
+  mainWindow.loadURL(url.pathToFileURL(path.join(__dirname, 'build', 'index.html')).href);
 
-  mainWindow.loadFile('index.html');
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.setIgnoreMouseEvents(true, { forward: true })
+    mainWindow.setMenuBarVisibility(false);
+    // mainWindow.webContents.openDevTools({ mode: 'detach' });
+  });
   
   mainWindow.on('closed', () => {
     console.log('Window closed, killing backend...');
@@ -60,28 +65,9 @@ function startBackend() {
   });
 }
 
-function waitForBackendReady() {
-  let dotCount = 1;
-
-  const tryConnect = () => {
-    http.get('http://127.0.0.1:5000/', () => {
-      console.log('Backend is ready');
-      createWindow();
-    }).on('error', () => {
-      process.stdout.write('Waiting for backend' + '.'.repeat(dotCount) + '   ');
-      process.stdout.write('\r');
-
-      dotCount = (dotCount % 3) + 1;
-
-      setTimeout(tryConnect, 1000);
-    });
-  };
-  tryConnect();
-}
-
 app.whenReady().then(() => {
   startBackend();
-  waitForBackendReady();
+  createWindow();
 });
 
 app.on('window-all-closed', () => {

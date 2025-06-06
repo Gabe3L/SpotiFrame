@@ -36,52 +36,62 @@ function createWindow() {
   });
 
   mainWindow.on('closed', () => {
-    console.log('Window closed, killing backend...');
-    if (backendProcess) {
-      backendProcess.kill();
-      backendProcess = null;
-    }
+    killBackend();
     app.quit();
   });
 }
 
-function startBackend() {
-  backendProcess = spawn('python', ['-m', 'backend.start'], {
-    cwd: __dirname,
-    shell: true,
+function setupProcessHandlers() {
+  process.on('exit', () => {
+    killBackend();
   });
 
-  if (backendProcess.stdout) {
-    backendProcess.stdout.on('data', (data) => {
-      console.log(`${data}`);
-    });
-  }
+  process.on('SIGINT', () => {
+    process.exit();
+  });
 
-  if (backendProcess.stderr) {
-    backendProcess.stderr.on('data', (data) => {
-      console.log(`${data}`);
-    });
-  }
+  process.on('SIGTERM', () => {
+    process.exit();
+  });
+}
+
+function startBackend() {
+  backendProcess = spawn('uvicorn', ['backend.main:app', '--host', '127.0.0.1', '--port', '5000']);
+
+  backendProcess.stdout.on('data', (data) => {
+    console.log(`${data}`);
+  });
+
+  backendProcess.stderr.on('data', (data) => {
+    console.log(`${data}`);
+  });
+
+  backendProcess.on('error', (err) => {
+    console.error('Failed to start backend process:', err);
+  });
 
   backendProcess.on('close', (code) => {
     console.log(`Exited with code ${code}`);
   });
 }
 
+function killBackend() {
+  if (backendProcess) {
+    backendProcess.kill();
+    backendProcess = null;
+  }
+}
+
 app.whenReady().then(() => {
+  setupProcessHandlers();
   startBackend();
   createWindow();
 });
 
 app.on('window-all-closed', () => {
+  killBackend();
   if (process.platform !== 'darwin') {
     app.quit();
-  }
-});
-
-app.on('will-quit', () => {
-  if (backendProcess) {
-    backendProcess.kill();
   }
 });
 

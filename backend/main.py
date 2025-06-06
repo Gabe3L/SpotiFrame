@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.app.spotify_api import SpotifyAPI
-from backend.app.auth import SpotifyAuth
+from backend.spotify_api import SpotifyAPI
+from backend.auth import SpotifyAuth
 
 app = FastAPI()
 

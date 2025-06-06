@@ -1,6 +1,10 @@
-img {
+.albumArt {
     width: 60px;
     height: 60px;
     background-color: #222222;
     border-radius: 4px;
+}
+
+.albumArtImage {
+    fill: cover;
 }

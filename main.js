@@ -17,7 +17,9 @@ function createWindow() {
     resizable: false,
     transparent: true,
     alwaysOnTop: true,
+    hasShadow: false,
     frame: false,
+    show: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -30,8 +32,9 @@ function createWindow() {
     mainWindow.setIgnoreMouseEvents(true, { forward: true })
     mainWindow.setMenuBarVisibility(false);
     // mainWindow.webContents.openDevTools({ mode: 'detach' });
+    mainWindow.show();
   });
-  
+
   mainWindow.on('closed', () => {
     console.log('Window closed, killing backend...');
     if (backendProcess) {

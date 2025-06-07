@@ -1,7 +1,8 @@
+import fs from 'fs';
 import path from 'path';
 import * as url from 'url';
 import { fileURLToPath } from 'url';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, screen } from 'electron';
 import { spawn } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -10,10 +11,66 @@ const __dirname = path.dirname(__filename);
 let backendProcess = null;
 let mainWindow = null;
 
+function loadConfig() {
+  const configDir = path.join(__dirname, 'config');
+  const configPath = path.join(configDir, 'frontend_config.json');
+  const defaultPath = path.join(configDir, 'default_frontend_config.json');
+
+  if (!fs.existsSync(configDir)) {
+    fs.mkdirSync(configDir);
+  }
+
+  if (!fs.existsSync(configPath)) {
+    if (!fs.existsSync(defaultPath)) {
+      throw new Error('Default frontend config is missing.');
+    }
+    fs.copyFileSync(defaultPath, configPath);
+    console.log('Created frontend_config.json from default.');
+  }
+
+  const configContents = fs.readFileSync(configPath, 'utf-8');
+  try {
+    return JSON.parse(configContents);
+  } catch (err) {
+    throw new Error('Invalid JSON in frontend_config.json');
+  }
+}
+
 function createWindow() {
+  const config = loadConfig();
+  const { horizontal, vertical } = config.position;
+
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width: screenWidth, height: screenHeight } = primaryDisplay.workArea;
+  
+  const windowWidth = 350;
+  const windowHeight = 140;
+  const edgeBuffer = 16;
+
+  let x;
+  let y;
+
+  if (horizontal === 'left') {
+    x = edgeBuffer;
+  } else if (horizontal === 'right') {
+    x = screenWidth - windowWidth - edgeBuffer;
+  } else {
+    throw new Error('Invalid horizontal position: must be "left" or "right"');
+  }
+
+  if (vertical === 'top') {
+    y = edgeBuffer;
+  } else if (vertical === 'bottom') {
+    y = screenHeight - windowHeight - edgeBuffer;
+  } else {
+    throw new Error('Invalid vertical position: must be "top" or "bottom"');
+  }
+
   mainWindow = new BrowserWindow({
-    width: 350,
-    height: 140,
+    width: windowWidth,
+    height: windowHeight,
+    x: x,
+    y: y,
     resizable: false,
     transparent: true,
     alwaysOnTop: true,

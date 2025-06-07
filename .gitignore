@@ -8,10 +8,10 @@ node_modules/
 build/
 *.log
 *.tsbuildinfo
-
-frontend/node_modules/*
-
 events.out.tfevents.*
+
+config/frontend_config.json
+config/backend_config.json
 
 .cache
 .env

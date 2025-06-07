@@ -1,5 +1,7 @@
 import requests
 
+###############################################################################################
+
 class SpotifyAPI:
     def __init__(self, access_token):
         self.headers = {"Authorization": f"Bearer {access_token}"}

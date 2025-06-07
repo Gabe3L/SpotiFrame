@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.spotify_api import SpotifyAPI
 from backend.auth import SpotifyAuth
 
+###############################################################################################
+
 app = FastAPI()
 
 app.add_middleware(
@@ -20,6 +22,6 @@ spotify_api = SpotifyAPI(auth.access_token)
 async def root():
     return {"status": "ok"}
 
-@app.get("/current_track")
+@app.get("/current-track")
 async def current_track():
     return spotify_api.get_current_track()

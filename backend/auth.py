@@ -101,6 +101,7 @@ def get_tokens(auth_code):
         "code_verifier": code_verifier
     }
     response = requests.post(token_url, data=payload)
+    response.raise_for_status()
     return response.json()
 
 

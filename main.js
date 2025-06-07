@@ -1,15 +1,18 @@
 import fs from 'fs';
+import url from 'url';
 import path from 'path';
-import * as url from 'url';
-import { fileURLToPath } from 'url';
-import { app, BrowserWindow, screen } from 'electron';
 import { spawn } from 'child_process';
+import { app, BrowserWindow, screen } from 'electron';
 
-const __filename = fileURLToPath(import.meta.url);
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let backendProcess = null;
 let mainWindow = null;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function loadConfig() {
   const configDir = path.join(__dirname, 'config');
@@ -35,6 +38,8 @@ function loadConfig() {
     throw new Error('Invalid JSON in frontend_config.json');
   }
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function createWindow() {
   const config = loadConfig();
@@ -112,6 +117,8 @@ function setupProcessHandlers() {
   });
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 function startBackend() {
   backendProcess = spawn('uvicorn', ['backend.main:app', '--host', '127.0.0.1', '--port', '5000']);
 
@@ -138,6 +145,8 @@ function killBackend() {
     backendProcess = null;
   }
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 app.whenReady().then(() => {
   setupProcessHandlers();

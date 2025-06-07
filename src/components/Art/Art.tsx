@@ -1,9 +1,13 @@
 import styles from "./Art.module.css";
 
-export default function Art() {
+interface ArtProps {
+  albumArt?: string;
+}
+
+export default function Art({ albumArt }: ArtProps) {
   return (
     <div className={styles.albumArt}>
-      <img className={styles.albumArtImage} alt="Album Art" />
+      <img className={styles.albumArtImage} src={albumArt} alt="Album Art" />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import styles from "./Art.module.css";
 
 interface ArtProps {
-  albumArt?: string;
+  albumArt: string;
 }
 
 export default function Art({ albumArt }: ArtProps) {

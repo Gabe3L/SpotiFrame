@@ -2,8 +2,9 @@ import { useEffect, useState, useCallback, useRef } from "react";
 
 import Art from "./components/Art/Art";
 import Text from "./components/Text/Text";
-import ControlMenu from "./components/ControlMenu/ControlMenu";
+import PlaybackMenu from "./components/PlaybackMenu/PlaybackMenu";
 import PlaybackBar from "./components/PlaybackBar/PlaybackBar";
+import ControlPanel from "./components/ControlPanel/ControlPanel";
 
 import globalStyles from "./App.module.css";
 
@@ -21,7 +22,7 @@ export default function App() {
   const [track, setTrack] = useState<TrackData | null>(null);
   const [isBackendAvailable, setIsBackendAvailable] = useState(false);
   const intervalId = useRef<NodeJS.Timeout | null>(null);
-  
+
   const checkBackend = useCallback(async (): Promise<boolean> => {
     try {
       const response = await fetch(BACKEND_URL);
@@ -60,11 +61,11 @@ export default function App() {
     async function waitForBackend() {
       if (!active) return;
 
-      const backendIsAvailable  = await checkBackend();
+      const backendIsAvailable = await checkBackend();
 
       if (!active) return;
 
-      if (backendIsAvailable ) {
+      if (backendIsAvailable) {
         setIsBackendAvailable(true);
         await fetchTrack();
 
@@ -87,10 +88,22 @@ export default function App() {
   return (
     <div className={globalStyles.location}>
       <div className={globalStyles.container}>
-        <Art albumArt={track?.album_art} />
-        <Text song={track?.song ?? "Error fetching track"} artist={track?.artist ?? ""} />
-        <ControlMenu />
-        <PlaybackBar progress={track?.progress ?? 0} />
+        <div className={globalStyles.content}>
+          <div className={globalStyles.imageBox}>
+            <Art albumArt={track?.album_art ?? "src/logo.webp"} />
+          </div>
+          <div className={globalStyles.detailsBox}>
+            <Text
+              song={track?.song ?? "Error fetching track"}
+              artist={track?.artist ?? ""}
+            />
+            <PlaybackMenu />
+            <PlaybackBar progress={track?.progress ?? 0} />
+          </div>
+          <div className={globalStyles.controlBox}>
+            <ControlPanel />
+          </div>
+        </div>
       </div>
     </div>
   );

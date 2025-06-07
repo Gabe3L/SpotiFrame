@@ -45,31 +45,24 @@ function createWindow() {
   const config = loadConfig();
   const { horizontal, vertical } = config.position;
 
-  const primaryDisplay = screen.getPrimaryDisplay();
-  const { width: screenWidth, height: screenHeight } = primaryDisplay.workArea;
-  
-  const windowWidth = 350;
-  const windowHeight = 140;
-  const edgeBuffer = 16;
+  const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workArea;
 
-  let x;
-  let y;
+  const contentWidth = 350;
+  const contentHeight = 140;
 
-  if (horizontal === 'left') {
-    x = edgeBuffer;
-  } else if (horizontal === 'right') {
-    x = screenWidth - windowWidth - edgeBuffer;
-  } else {
-    throw new Error('Invalid horizontal position: must be "left" or "right"');
-  }
+  const paddingHorizontal = 30 * 2;
+  const paddingVertical = 25 * 2;
 
-  if (vertical === 'top') {
-    y = edgeBuffer;
-  } else if (vertical === 'bottom') {
-    y = screenHeight - windowHeight - edgeBuffer;
-  } else {
-    throw new Error('Invalid vertical position: must be "top" or "bottom"');
-  }
+  const windowWidth = contentWidth + paddingHorizontal;
+  const windowHeight = contentHeight + paddingVertical;
+
+  const x = horizontal === 'left' ? 0
+    : horizontal === 'right' ? screenWidth - windowWidth
+      : (() => { throw new Error('Invalid horizontal position: must be "left" or "right"'); })();
+
+  const y = vertical === 'top' ? 0
+    : vertical === 'bottom' ? screenHeight - windowHeight
+      : (() => { throw new Error('Invalid vertical position: must be "top" or "bottom"'); })();
 
   mainWindow = new BrowserWindow({
     width: windowWidth,

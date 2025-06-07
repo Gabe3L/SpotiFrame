@@ -13,6 +13,8 @@ events.out.tfevents.*
 config/frontend_config.json
 config/backend_config.json
 
+idea.png
+
 .cache
 .env
 .venv

@@ -75,6 +75,7 @@ function createWindow() {
     hasShadow: false,
     frame: false,
     show: false,
+    icon: path.join(__dirname, 'assets', 'logo.ico'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,

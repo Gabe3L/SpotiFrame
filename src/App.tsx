@@ -90,7 +90,7 @@ export default function App() {
       <div className={globalStyles.container}>
         <div className={globalStyles.content}>
           <div className={globalStyles.imageBox}>
-            <Art albumArt={track?.album_art ?? "src/logo.webp"} />
+            <Art albumArt={track?.album_art ?? "assets/logo.webp"} />
           </div>
           <div className={globalStyles.detailsBox}>
             <Text

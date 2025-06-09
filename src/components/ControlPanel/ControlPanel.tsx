@@ -4,7 +4,7 @@ import styles from "./ControlPanel.module.css";
 
 export default function ControlPanel() {
   return (
-    <div className={styles.playIcons}>
+    <div className={styles.controlIcons}>
       <XIcon color="#ffffff"/>
       <GripVerticalIcon color="#ffffff"/>
       <MinusIcon color="#ffffff"/>

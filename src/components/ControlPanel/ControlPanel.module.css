@@ -1,3 +1,11 @@
+.controlIcons {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
 img {
     width: 60px;
     height: 60px;

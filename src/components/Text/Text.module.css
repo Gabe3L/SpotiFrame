@@ -1,5 +1,4 @@
 .textBox {
-    flex-grow: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -24,4 +23,5 @@
     font-size: 12px;
     font-weight: 400;
     color: #aaaaaa;
+    min-height: 12px;
 }

@@ -94,8 +94,8 @@ export default function App() {
           </div>
           <div className={globalStyles.detailsBox}>
             <Text
-              song={track?.song ?? "Error fetching track"}
-              artist={track?.artist ?? ""}
+              song={track?.song ?? "Waiting for song..."}
+              artist={track?.artist ?? " "}
             />
             <PlaybackMenu />
             <PlaybackBar progress={track?.progress ?? 0} />

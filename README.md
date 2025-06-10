@@ -6,7 +6,7 @@
 
 ## Features
 
-- Modular React component layout with a clean GUI
+- Modular React component layout with a clean glass GUI
 - Integrated FastAPI backend for authentication and Spotify data
 - Spotify PKCE Workflow for real-time display
 

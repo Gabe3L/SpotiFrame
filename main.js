@@ -53,16 +53,8 @@ function createWindow() {
   const paddingHorizontal = 30 * 2;
   const paddingVertical = 25 * 2;
 
-  const windowWidth = contentWidth + paddingHorizontal;
-  const windowHeight = contentHeight + paddingVertical;
-
-  const x = horizontal === 'left' ? 0
-    : horizontal === 'right' ? screenWidth - windowWidth
-      : (() => { throw new Error('Invalid horizontal position: must be "left" or "right"'); })();
-
-  const y = vertical === 'top' ? 0
-    : vertical === 'bottom' ? screenHeight - windowHeight
-      : (() => { throw new Error('Invalid vertical position: must be "top" or "bottom"'); })();
+  const x = horizontal === 'left' ? 0 : screenWidth - (contentWidth + paddingHorizontal);
+  const y = vertical === 'top' ? 0 : screenHeight - (contentHeight + paddingVertical);
 
   mainWindow = new BrowserWindow({
     width: windowWidth,

@@ -16,8 +16,8 @@ let mainWindow = null;
 
 function loadConfig() {
   const configDir = path.join(__dirname, 'config');
-  const configPath = path.join(configDir, 'frontend_config.json');
-  const defaultPath = path.join(configDir, 'default_frontend_config.json');
+  const configPath = path.join(configDir, 'ui_config.json');
+  const defaultPath = path.join(configDir, 'default_ui_config.json');
 
   if (!fs.existsSync(configDir)) {
     fs.mkdirSync(configDir);
@@ -25,17 +25,17 @@ function loadConfig() {
 
   if (!fs.existsSync(configPath)) {
     if (!fs.existsSync(defaultPath)) {
-      throw new Error('Default frontend config is missing.');
+      throw new Error('Default ui config is missing.');
     }
     fs.copyFileSync(defaultPath, configPath);
-    console.log('Created frontend_config.json from default.');
+    console.log('Created ui_config.json from default.');
   }
 
   const configContents = fs.readFileSync(configPath, 'utf-8');
   try {
     return JSON.parse(configContents);
   } catch (err) {
-    throw new Error('Invalid JSON in frontend_config.json');
+    throw new Error('Invalid JSON in ui_config.json');
   }
 }
 

@@ -1,5 +1,4 @@
 import os
-import json
 import base64
 import hashlib
 import urllib.parse
@@ -8,38 +7,12 @@ import socketserver
 import threading
 import webbrowser
 import requests
-from typing import Dict
 
 ###############################################################################################
 
-def load_config() -> Dict[str, Dict[str, str]]:
-    backend_config_path = "config/backend_config.json"
-    default_config_path = "config/default_backend_config.json"
-
-    try:
-        if os.path.isfile(backend_config_path):
-            with open(backend_config_path, "r") as config_file:
-                return json.load(config_file)
-        else:
-            raise FileNotFoundError
-    except (FileNotFoundError, json.JSONDecodeError):
-        with open(default_config_path, "r") as default_file:
-            default_config = json.load(default_file)
-            
-        os.makedirs(os.path.dirname(backend_config_path), exist_ok=True)
-
-        with open(backend_config_path, "w") as config_file:
-            json.dump(default_config, config_file, indent=4)
-            
-        return default_config
-
-###############################################################################################
-            
-config = load_config()
-
-IP_ADDRESS = config['authentication']['ip_address']
-PORT = config['authentication']['port']
-CLIENT_ID = config['authentication']['client_id']
+PORT = "8888"
+IP_ADDRESS = "127.0.0.1"
+CLIENT_ID = "bf5b1822a759498fa4f545ac1fc81fae"
 REDIRECT_URI = f"http://{IP_ADDRESS}:{PORT}/callback"
 SCOPE = "user-read-playback-state user-read-currently-playing"
 

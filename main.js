@@ -48,7 +48,7 @@ function createWindow() {
   const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workArea;
 
   const windowWidth = 350;
-  const windowHeight = 140;
+  const windowHeight = 127;
 
   const marginHorizontal = 25;
   const marginVertical = 35;

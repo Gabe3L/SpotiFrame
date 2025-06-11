@@ -1,4 +1,5 @@
 import os
+import json
 import base64
 import hashlib
 import urllib.parse
@@ -7,6 +8,7 @@ import socketserver
 import threading
 import webbrowser
 import requests
+from typing import Dict
 
 ###############################################################################################
 
@@ -15,15 +17,19 @@ IP_ADDRESS = "127.0.0.1"
 CLIENT_ID = "bf5b1822a759498fa4f545ac1fc81fae"
 REDIRECT_URI = f"http://{IP_ADDRESS}:{PORT}/callback"
 SCOPE = "user-read-playback-state user-read-currently-playing"
+TOKEN_PATH = "config/tokens.json"
+
 
 ###############################################################################################
 
-code_verifier = base64.urlsafe_b64encode(os.urandom(64)).rstrip(b'=').decode('utf-8')
+code_verifier = base64.urlsafe_b64encode(
+    os.urandom(64)).rstrip(b'=').decode('utf-8')
 code_challenge = base64.urlsafe_b64encode(
     hashlib.sha256(code_verifier.encode()).digest()
 ).rstrip(b'=').decode('utf-8')
 
 auth_code = None
+
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
@@ -36,7 +42,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-type", "text/html")
             self.end_headers()
-            
+
             self.wfile.write(b"""
                 <html>
                 <head>
@@ -95,8 +101,51 @@ def get_tokens(auth_code):
     return response.json()
 
 
+def save_tokens(tokens: Dict[str, str]):
+    os.makedirs(os.path.dirname(TOKEN_PATH), exist_ok=True)
+    with open(TOKEN_PATH, "w") as f:
+        json.dump(tokens, f, indent=4)
+
+
+def load_tokens() -> Dict[str, str] | None:
+    if os.path.exists(TOKEN_PATH):
+        with open(TOKEN_PATH, "r") as f:
+            return json.load(f)
+    return None
+
+
+def refresh_access_token(refresh_token: str) -> Dict[str, str]:
+    token_url = "https://accounts.spotify.com/api/token"
+    payload = {
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+        "client_id": CLIENT_ID
+    }
+    response = requests.post(token_url, data=payload)
+    response.raise_for_status()
+    return response.json()
+
+
 class SpotifyAuth:
     def __init__(self):
-        auth_code = get_auth_code()
-        tokens = get_tokens(auth_code)
+        saved_tokens = load_tokens()
+
+        if saved_tokens:
+            self.access_token = saved_tokens["access_token"]
+            self.refresh_token = saved_tokens["refresh_token"]
+        else:
+            auth_code = get_auth_code()
+            tokens = get_tokens(auth_code)
+            self.access_token = tokens["access_token"]
+            self.refresh_token = tokens["refresh_token"]
+            save_tokens(tokens)
+
+    def refresh(self):
+        tokens = refresh_access_token(self.refresh_token)
         self.access_token = tokens["access_token"]
+        if "refresh_token" in tokens:
+            self.refresh_token = tokens["refresh_token"]
+        save_tokens({
+            "access_token": self.access_token,
+            "refresh_token": self.refresh_token
+        })

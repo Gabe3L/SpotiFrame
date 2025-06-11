@@ -3,8 +3,12 @@ import requests
 ###############################################################################################
 
 class SpotifyAPI:
-    def __init__(self, access_token):
-        self.headers = {"Authorization": f"Bearer {access_token}"}
+    def __init__(self, auth):
+        self.auth = auth
+        self.update_headers()
+
+    def update_headers(self):
+        self.headers = {"Authorization": f"Bearer {self.auth.access_token}"}
 
     def get_current_track(self):
         track_info = {
@@ -14,9 +18,20 @@ class SpotifyAPI:
             "progress": 0
         }
 
-        r = requests.get("https://api.spotify.com/v1/me/player/currently-playing", headers=self.headers)
-        if r.status_code == 200 and r.content:
-            data = r.json()
+        response = requests.get(
+            "https://api.spotify.com/v1/me/player/currently-playing",
+            headers=self.headers
+        )
+
+        if response.status_code == 401:
+            self.auth.refresh()
+            self.update_headers()
+            response = requests.get(
+                "https://api.spotify.com/v1/me/player/currently-playing",
+                headers=self.headers
+            )
+        if response.status_code == 200 and response.content:
+            data = response.json()
             if data.get("item"):
                 item = data["item"]
                 track_info["song"] = item.get("name", "")

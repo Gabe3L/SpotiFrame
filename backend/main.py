@@ -16,7 +16,7 @@ app.add_middleware(
 )
 
 auth = SpotifyAuth()
-spotify_api = SpotifyAPI(auth.access_token)
+spotify_api = SpotifyAPI(auth)
 
 @app.get("/")
 async def root():

@@ -10,6 +10,7 @@ build/
 *.tsbuildinfo
 events.out.tfevents.*
 
+config/tokens.json
 config/ui_config.json
 
 idea.png

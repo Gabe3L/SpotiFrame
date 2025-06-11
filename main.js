@@ -53,8 +53,11 @@ function createWindow() {
   const paddingHorizontal = 30 * 2;
   const paddingVertical = 25 * 2;
 
-  const x = horizontal === 'left' ? 0 : screenWidth - (contentWidth + paddingHorizontal);
-  const y = vertical === 'top' ? 0 : screenHeight - (contentHeight + paddingVertical);
+  const windowWidth = contentWidth + paddingHorizontal;
+  const windowHeight = contentHeight + paddingVertical;
+
+  const x = horizontal === 'left' ? 0 : screenWidth - windowWidth;
+  const y = vertical === 'top' ? 0 : screenHeight - windowHeight;
 
   mainWindow = new BrowserWindow({
     width: windowWidth,

@@ -2,7 +2,7 @@ import fs from 'fs';
 import url from 'url';
 import path from 'path';
 import { spawn } from 'child_process';
-import { app, BrowserWindow, screen } from 'electron';
+import { app, ipcMain, BrowserWindow, screen } from 'electron';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -47,17 +47,14 @@ function createWindow() {
 
   const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workArea;
 
-  const contentWidth = 350;
-  const contentHeight = 140;
+  const windowWidth = 350;
+  const windowHeight = 140;
 
-  const paddingHorizontal = 30 * 2;
-  const paddingVertical = 25 * 2;
+  const marginHorizontal = 25;
+  const marginVertical = 35;
 
-  const windowWidth = contentWidth + paddingHorizontal;
-  const windowHeight = contentHeight + paddingVertical;
-
-  const x = horizontal === 'left' ? 0 : screenWidth - windowWidth;
-  const y = vertical === 'top' ? 0 : screenHeight - windowHeight;
+  const x = horizontal === 'left' ? marginHorizontal : screenWidth - windowWidth - marginHorizontal;
+  const y = vertical === 'top' ? marginVertical : screenHeight - windowHeight - marginVertical;
 
   mainWindow = new BrowserWindow({
     width: windowWidth,
@@ -72,15 +69,16 @@ function createWindow() {
     show: false,
     icon: path.join(__dirname, 'assets', 'logo.ico'),
     webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
-      contextIsolation: false,
+      enableRemoteModule: false,
+      contextIsolation: true,
     }
   });
 
   mainWindow.loadURL(url.pathToFileURL(path.join(__dirname, 'build', 'index.html')).href);
 
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.setIgnoreMouseEvents(true, { forward: true })
     mainWindow.setMenuBarVisibility(false);
     // mainWindow.webContents.openDevTools({ mode: 'detach' });
     mainWindow.show();
@@ -104,6 +102,13 @@ function setupProcessHandlers() {
   process.on('SIGTERM', () => {
     process.exit();
   });
+
+  ipcMain.on('app-close', () => {
+    const windows = BrowserWindow.getAllWindows();
+    if (windows.length > 0) {
+      app.quit();
+    }
+});
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////

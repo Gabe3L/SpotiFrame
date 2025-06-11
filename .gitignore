@@ -3,6 +3,7 @@ __pycache__/
 
 *.js.map
 *.d.ts
+!global.d.ts
 
 node_modules/
 build/

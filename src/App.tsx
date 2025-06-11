@@ -8,6 +8,8 @@ import ControlPanel from "./components/ControlPanel/ControlPanel";
 
 import globalStyles from "./App.module.css";
 
+import logo from "./assets/logo.webp";
+
 interface TrackData {
   song: string;
   artist: string;
@@ -86,23 +88,21 @@ export default function App() {
   }, [checkBackend, fetchTrack]);
 
   return (
-    <div className={globalStyles.location}>
-      <div className={globalStyles.container}>
-        <div className={globalStyles.content}>
-          <div className={globalStyles.imageBox}>
-            <Art albumArt={track?.album_art ?? "assets/logo.webp"} />
-          </div>
-          <div className={globalStyles.detailsBox}>
-            <Text
-              song={track?.song ?? "Waiting for song..."}
-              artist={track?.artist ?? " "}
-            />
-            <PlaybackMenu />
-            <PlaybackBar progress={track?.progress ?? 0} />
-          </div>
-          <div className={globalStyles.controlBox}>
-            <ControlPanel />
-          </div>
+    <div className={globalStyles.container}>
+      <div className={globalStyles.content}>
+        <div className={globalStyles.imageBox}>
+          <Art albumArt={track?.album_art ?? logo} />
+        </div>
+        <div className={globalStyles.detailsBox}>
+          <Text
+            song={track?.song ?? "Waiting for song..."}
+            artist={track?.artist ?? " "}
+          />
+          <PlaybackMenu />
+          <PlaybackBar progress={track?.progress ?? 0} />
+        </div>
+        <div className={globalStyles.controlBox}>
+          <ControlPanel />
         </div>
       </div>
     </div>

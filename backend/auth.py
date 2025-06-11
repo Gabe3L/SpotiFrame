@@ -59,9 +59,26 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             query = urllib.parse.urlparse(self.path).query
             params = urllib.parse.parse_qs(query)
             auth_code = params.get("code", [None])[0]
+
             self.send_response(200)
+            self.send_header("Content-type", "text/html")
             self.end_headers()
-            self.wfile.write(b"You can now close this window.")
+            
+            self.wfile.write(b"""
+                <html>
+                <head>
+                    <title>SpotiFrame - Authorized</title>
+                    <script>
+                        window.onload = function() {
+                            window.close();
+                        };
+                    </script>
+                </head>
+                <body>
+                    <p>Authorization complete. You can close this window.</p>
+                </body>
+                </html>
+            """)
             threading.Thread(target=self.server.shutdown, daemon=True).start()
 
 

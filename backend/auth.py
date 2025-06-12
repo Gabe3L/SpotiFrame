@@ -16,7 +16,7 @@ PORT = "8888"
 IP_ADDRESS = "127.0.0.1"
 CLIENT_ID = "bf5b1822a759498fa4f545ac1fc81fae"
 REDIRECT_URI = f"http://{IP_ADDRESS}:{PORT}/callback"
-SCOPE = "user-read-playback-state user-read-currently-playing"
+SCOPE = "user-read-playback-state user-read-currently-playing user-modify-playback-state"
 TOKEN_PATH = "config/tokens.json"
 
 

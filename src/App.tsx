@@ -13,9 +13,9 @@ import logo from "./assets/logo.webp";
 interface TrackData {
   song: string;
   artist: string;
-  album_art: string;
   progress: number;
-  // paused: boolean;
+  is_playing: boolean;
+  album_art: string;
 }
 
 const BACKEND_URL = "http://127.0.0.1:5000";
@@ -44,8 +44,9 @@ export default function App() {
         if (
           previousTrack?.song === trackData.song &&
           previousTrack?.artist === trackData.artist &&
-          previousTrack?.album_art === trackData.album_art &&
-          previousTrack?.progress === trackData.progress
+          previousTrack?.progress === trackData.progress &&
+          previousTrack?.is_playing === trackData.is_playing &&
+          previousTrack?.album_art === trackData.album_art
         ) {
           return previousTrack;
         }
@@ -87,6 +88,45 @@ export default function App() {
     };
   }, [checkBackend, fetchTrack]);
 
+  const playToggle = async () => {
+    try {
+      const endpoint = track?.is_playing ? "/pause" : "/play";
+      const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+        method: "PUT",
+      });
+
+      if (!response.ok) throw new Error("Failed to toggle playback");
+    } catch (error) {
+      console.error("Error toggling playback:", error);
+    }
+  };
+
+  const skipForwardToggle = async () => {
+    try {
+      const endpoint = "/skip-forward";
+      const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+        method: "PUT",
+      });
+
+      if (!response.ok) throw new Error("Failed to toggle playback");
+    } catch (error) {
+      console.error("Error skipping forwards:", error);
+    }
+  };
+
+  const skipBackwardToggle = async () => {
+    try {
+      const endpoint = "/skip-backward";
+      const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+        method: "PUT",
+      });
+
+      if (!response.ok) throw new Error("Failed to skip backwards");
+    } catch (error) {
+      console.error("Error skipping backwards:", error);
+    }
+  };
+
   return (
     <div className={globalStyles.container}>
       <div className={globalStyles.content}>
@@ -98,7 +138,12 @@ export default function App() {
             song={track?.song ?? "Waiting for song..."}
             artist={track?.artist ?? " "}
           />
-          <PlaybackMenu />
+          <PlaybackMenu
+            isPlaying={track?.is_playing ?? false}
+            skipBackwardToggle={skipBackwardToggle}
+            playToggle={playToggle}
+            skipForwardToggle={skipForwardToggle}
+          />
           <PlaybackBar progress={track?.progress ?? 0} />
         </div>
         <div className={globalStyles.controlBox}>

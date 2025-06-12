@@ -8,7 +8,7 @@ import socketserver
 import threading
 import webbrowser
 import requests
-from typing import Dict
+from typing import Optional, Dict, Tuple
 
 ###############################################################################################
 
@@ -22,12 +22,16 @@ TOKEN_PATH = "config/tokens.json"
 
 ###############################################################################################
 
-code_verifier = base64.urlsafe_b64encode(
-    os.urandom(64)).rstrip(b'=').decode('utf-8')
-code_challenge = base64.urlsafe_b64encode(
-    hashlib.sha256(code_verifier.encode()).digest()
-).rstrip(b'=').decode('utf-8')
+def generate_pkce_pair() -> Tuple[str, str]:
+    verifier = base64.urlsafe_b64encode(
+        os.urandom(64)).rstrip(b"=").decode("utf-8")
+    challenge = base64.urlsafe_b64encode(
+        hashlib.sha256(verifier.encode()).digest()
+    ).rstrip(b"=").decode("utf-8")
+    return verifier, challenge
 
+
+code_verifier, code_challenge = generate_pkce_pair()
 auth_code = None
 
 
@@ -44,19 +48,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
 
             self.wfile.write(b"""
-                <html>
-                <head>
-                    <title>SpotiFrame - Authorized</title>
-                    <script>
-                        window.onload = function() {
-                            window.close();
-                        };
-                    </script>
-                </head>
-                <body>
-                    <p>Authorization complete. You can close this window.</p>
-                </body>
-                </html>
+                <html><body>
+                <p>Authorization complete. You may close this window.</p>
+                <script>window.onload = () => window.close();</script>
+                </body></html>
             """)
             threading.Thread(target=self.server.shutdown, daemon=True).start()
 
@@ -65,8 +60,7 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     allow_reuse_address = True
 
 
-def get_auth_code():
-    global auth_code
+def get_auth_code() -> Optional[str]:
     auth_params = {
         "client_id": CLIENT_ID,
         "response_type": "code",
@@ -78,16 +72,12 @@ def get_auth_code():
     auth_url = f"https://accounts.spotify.com/authorize?{urllib.parse.urlencode(auth_params)}"
     webbrowser.open(auth_url)
 
-    with ThreadedTCPServer((IP_ADDRESS, int(PORT)), Handler) as httpd:
-        httpd.timeout = 60
-        try:
-            httpd.handle_request()
-        finally:
-            httpd.server_close()
+    with ThreadedTCPServer((IP_ADDRESS, int(PORT)), Handler) as server:
+        server.timeout = 60
+        server.handle_request()
     return auth_code
 
-
-def get_tokens(auth_code):
+def get_tokens(auth_code) -> Dict:
     token_url = "https://accounts.spotify.com/api/token"
     payload = {
         "grant_type": "authorization_code",
@@ -100,14 +90,12 @@ def get_tokens(auth_code):
     response.raise_for_status()
     return response.json()
 
-
-def save_tokens(tokens: Dict[str, str]):
+def save_tokens(tokens: Dict[str, str]) -> None:
     os.makedirs(os.path.dirname(TOKEN_PATH), exist_ok=True)
     with open(TOKEN_PATH, "w") as f:
         json.dump(tokens, f, indent=4)
 
-
-def load_tokens() -> Dict[str, str] | None:
+def load_tokens() -> Optional[Dict[str, str]]:
     if os.path.exists(TOKEN_PATH):
         with open(TOKEN_PATH, "r") as f:
             return json.load(f)

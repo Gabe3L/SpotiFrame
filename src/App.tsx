@@ -7,7 +7,6 @@ import PlaybackBar from "./components/PlaybackBar/PlaybackBar";
 import ControlPanel from "./components/ControlPanel/ControlPanel";
 
 import globalStyles from "./App.module.css";
-
 import logo from "./assets/logo.webp";
 
 interface TrackData {
@@ -22,10 +21,10 @@ const BACKEND_URL = "http://127.0.0.1:5000";
 
 export default function App() {
   const pollingDelayRef = useRef(false);
-
+  const intervalId = useRef<NodeJS.Timeout | null>(null);
+  
   const [track, setTrack] = useState<TrackData | null>(null);
   const [isBackendAvailable, setIsBackendAvailable] = useState(false);
-  const intervalId = useRef<NodeJS.Timeout | null>(null);
 
   const checkBackend = useCallback(async (): Promise<boolean> => {
     try {
@@ -68,7 +67,7 @@ export default function App() {
       }
       return;
     }
-    
+
     try {
       const response = await fetch(`${BACKEND_URL}/current-track`);
       if (!response.ok) throw new Error("Network response was not ok");
@@ -97,19 +96,16 @@ export default function App() {
 
     async function waitForBackend() {
       if (!active) return;
-
       const backendIsAvailable = await checkBackend();
-
       if (!active) return;
+      
+      setIsBackendAvailable(backendIsAvailable);
 
       if (backendIsAvailable) {
-        setIsBackendAvailable(true);
         await fetchTrack();
-
         if (intervalId.current) clearInterval(intervalId.current);
         intervalId.current = setInterval(fetchTrack, 1000);
       } else {
-        setIsBackendAvailable(false);
         setTimeout(waitForBackend, 1000);
       }
     }
@@ -125,37 +121,26 @@ export default function App() {
   const playToggle = async () => {
     if (!track) return;
 
-    const newState = !track.is_playing;
-    setTrack((prev) => (prev ? { ...prev, is_playing: newState } : prev));
+    const newIsPlaying = !track.is_playing;
+    setTrack((prev) => prev ? { ...prev, is_playing: newIsPlaying } : prev);
 
     pollingDelayRef.current = true;
     setTimeout(() => (pollingDelayRef.current = false), 1200);
 
     try {
       const endpoint = track?.is_playing ? "/pause" : "/play";
-      const response = await fetch(`${BACKEND_URL}${endpoint}`, {
-        method: "PUT",
-      });
-
+      const response = await fetch(`${BACKEND_URL}${endpoint}`, { method: "PUT" });
       if (!response.ok) throw new Error("Failed to toggle playback");
     } catch (error) {
       console.error("Error toggling playback:", error);
-      setTrack((prev) => (prev ? { ...prev, is_playing: !newState } : prev));
+      setTrack((prev) => prev ? { ...prev, is_playing: !newIsPlaying } : prev);
     }
   };
 
-  const skipForwardToggle = async () => {
+  const skipTrack = async (direction: "forward" | "backward") => {
     try {
-      await fetch(`${BACKEND_URL}/skip-forward`, { method: "PUT" });
-      await fetchTrack();
-    } catch (error) {
-      console.error("Error skipping forwards:", error);
-    }
-  };
-
-  const skipBackwardToggle = async () => {
-    try {
-      await fetch(`${BACKEND_URL}/skip-backward`, { method: "PUT" });
+      const endpoint = direction === "forward" ? "/skip-forward" : "/skip-backward";
+      await fetch(`${BACKEND_URL}${endpoint}`, { method: "PUT" });
       await fetchTrack();
     } catch (error) {
       console.error("Error skipping backwards:", error);
@@ -175,9 +160,9 @@ export default function App() {
           />
           <PlaybackMenu
             isPlaying={track?.is_playing ?? false}
-            skipBackwardToggle={skipBackwardToggle}
             playToggle={playToggle}
-            skipForwardToggle={skipForwardToggle}
+            skipBackwardToggle={() => skipTrack("backward")}
+            skipForwardToggle={() => skipTrack("forward")}
           />
           <PlaybackBar progress={track?.progress ?? 0} />
         </div>

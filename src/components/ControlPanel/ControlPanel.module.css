@@ -12,3 +12,26 @@ img {
     background-color: #222222;
     border-radius: 4px;
 }
+
+.closeRegion,
+.dragRegion,
+.minimizeRegion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;;
+}
+
+.closeRegion,
+.minimizeRegion {
+    cursor: pointer;
+}
+
+.dragRegion {
+    -webkit-app-region: drag;
+    cursor: -webkit-grab;
+}
+
+.dragRegion:active {
+    cursor: -webkit-grabbing;
+}

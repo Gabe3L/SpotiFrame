@@ -1,17 +1,22 @@
-import { MinusIcon, XIcon, GripVerticalIcon } from 'lucide-react';
+import { MinusIcon, XIcon, GripVerticalIcon } from "lucide-react";
 
 import styles from "./ControlPanel.module.css";
 
 export default function ControlPanel() {
-  const handleClose = () => {
-    window.electronAPI?.closeApp();
-  };
+  const handleClose = () => window.electronAPI?.closeApp();
+  const handleMinimize = () => window.electronAPI?.minimizeApp();
 
   return (
     <div className={styles.controlIcons}>
-      <XIcon color="#ffffff" onClick={handleClose} style={{ cursor: 'pointer' }} />
-      <GripVerticalIcon color="#ffffff"/>
-      <MinusIcon color="#ffffff"/>
+      <div className={styles.closeRegion} onClick={handleClose}>
+        <XIcon />
+      </div>
+      <div className={styles.dragRegion}>
+        <GripVerticalIcon />
+      </div>
+      <div className={styles.minimizeRegion} onClick={handleMinimize}>
+        <MinusIcon />
+      </div>
     </div>
   );
 }

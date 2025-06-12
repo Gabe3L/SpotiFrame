@@ -104,11 +104,14 @@ function setupProcessHandlers() {
   });
 
   ipcMain.on('app-close', () => {
-    const windows = BrowserWindow.getAllWindows();
-    if (windows.length > 0) {
-      app.quit();
-    }
-});
+    const win = BrowserWindow.getFocusedWindow();
+    if (win) app.quit();
+  });
+
+  ipcMain.on('app-minimize', () => {
+    const win = BrowserWindow.getFocusedWindow();
+    if (win) win.minimize();
+  });
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
